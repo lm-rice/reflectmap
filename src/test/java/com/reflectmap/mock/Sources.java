@@ -1,4 +1,4 @@
-package poc;
+package com.reflectmap.mock;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,31 +39,25 @@ public class Sources {
 
     @AllArgsConstructor
     @Getter
-    static
-    class InnerSourceA {
-        // Field is non-final to allow reflective access.
-        Object value;
+    public static class InnerSourceA {
+        private final Object value;
     }
 
     @AllArgsConstructor
     @Getter
-    static
-    class SourceA {
+    public static class SourceA {
         private final String value;
     }
 
-    // ----- Source and Destination classes for inner container mapping -----
     @AllArgsConstructor
     @Getter
-    static
-    class SourceAWithInner {
+    public static class SourceAWithInner {
         private final InnerSourceA innerA;
     }
 
     @AllArgsConstructor
     @Getter
-    static
-    class SourceB {
+    public static class SourceB {
         private final int value;
     }
 }
