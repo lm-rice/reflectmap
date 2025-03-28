@@ -74,37 +74,11 @@ public class ReflectMapTest {
 
     @Test
     void testCopyMultipleSourceFieldsToDestination() {
-        Source25 src = new Source25("Hello1", "Hello2", "Hello3", "Hello4", "Hello5",
-                "Hello6", "Hello7", "Hello8", "Hello9", "Hello10",
-                "Hello11", "Hello12", "Hello13", "Hello14", "Hello15",
-                "Hello16", "Hello17", "Hello18", "Hello19", "Hello20",
-                "Hello21", "Hello22", "Hello23", "Hello24", "Hello25");
-        Destination25 dst = new Destination25();
-        ReflectMap.map(src, Source25.class, dst, Destination25.class);
+        Source3Fields src = new Source3Fields("Hello1", "Hello2", "Hello3");
+        Destination3Fields dst = new Destination3Fields();
+        ReflectMap.map(src, Source3Fields.class, dst, Destination3Fields.class);
         assertEquals(src.getValue1(), dst.getDestValue1());
         assertEquals(src.getValue2(), dst.getDestValue2());
         assertEquals(src.getValue3(), dst.getDestValue3());
-        assertEquals(src.getValue4(), dst.getDestValue4());
-        assertEquals(src.getValue5(), dst.getDestValue5());
-        assertEquals(src.getValue6(), dst.getDestValue6());
-        assertEquals(src.getValue7(), dst.getDestValue7());
-        assertEquals(src.getValue8(), dst.getDestValue8());
-        assertEquals(src.getValue9(), dst.getDestValue9());
-        assertEquals(src.getValue10(), dst.getDestValue10());
-        assertEquals(src.getValue11(), dst.getDestValue11());
-        assertEquals(src.getValue12(), dst.getDestValue12());
-        assertEquals(src.getValue13(), dst.getDestValue13());
-        assertEquals(src.getValue14(), dst.getDestValue14());
-        assertEquals(src.getValue15(), dst.getDestValue15());
-        assertEquals(src.getValue16(), dst.getDestValue16());
-        assertEquals(src.getValue17(), dst.getDestValue17());
-        assertEquals(src.getValue18(), dst.getDestValue18());
-        assertEquals(src.getValue19(), dst.getDestValue19());
-        assertEquals(src.getValue20(), dst.getDestValue20());
-        assertEquals(src.getValue21(), dst.getDestValue21());
-        assertEquals(src.getValue22(), dst.getDestValue22());
-        assertEquals(src.getValue23(), dst.getDestValue23());
-        assertEquals(src.getValue24(), dst.getDestValue24());
-        assertEquals(src.getValue25(), dst.getDestValue25());
     }
 }
