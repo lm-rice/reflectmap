@@ -102,25 +102,20 @@ public final class ReflectMapLambdaCompiler {
      * @throws Throwable if a method handle invocation fails.
      */
     private static BiConsumer<Object, Object> compile(BiConsumer<Object, Object> a, BiConsumer<Object, Object> b) throws Throwable {
-        MethodHandle compositeHandle = MethodHandles.insertArguments(HANDLE_CACHE.COMPOSE, 0, a, b);
-        compositeHandle = compositeHandle.asType(MethodType.methodType(void.class, Object.class, Object.class));
-        return asLambda(compositeHandle);
+        return asLambda(MethodHandles.insertArguments(HANDLE_CACHE.COMPOSE, 0, a, b));
     }
 
+    @SuppressWarnings("unchecked")
     private static BiConsumer<Object, Object> asLambda(MethodHandle handle) throws Throwable {
-        @SuppressWarnings("unchecked")
-        BiConsumer<Object, Object> l = (BiConsumer<Object, Object>) CALL_SITE.getTarget().invokeExact(handle);
-        return l;
+        return (BiConsumer<Object, Object>) CALL_SITE.getTarget().invokeExact(handle);
     }
 
     public static MethodHandle findGetterHandle(Class<?> cls, Field f) throws NoSuchFieldException, IllegalAccessException {
-        MethodHandles.Lookup lookup = LOOKUP_STORE.get(cls);
-        return lookup.findGetter(cls, f.getName(), f.getType());
+        return LOOKUP_STORE.get(cls).findGetter(cls, f.getName(), f.getType());
     }
 
     public static MethodHandle findSetterHandle(Class<?> cls, Field f) throws NoSuchFieldException, IllegalAccessException {
-        MethodHandles.Lookup lookup = LOOKUP_STORE.get(cls);
-        return lookup.findSetter(cls, f.getName(), f.getType());
+        return LOOKUP_STORE.get(cls).findSetter(cls, f.getName(), f.getType());
     }
 
 }
