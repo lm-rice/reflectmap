@@ -4,6 +4,8 @@ import com.reflectmap.annotation.FieldMapping;
 import com.reflectmap.core.utils.ReflectMapTypeUtils;
 import com.reflectmap.exception.FieldNotFoundException;
 import com.reflectmap.exception.IncompatibleFieldTypesException;
+import com.reflectmap.internal.lambda.LambdaCompiler;
+import com.reflectmap.internal.lambda.LambdaHandleFactory;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -20,11 +22,11 @@ public final class AnnotationDrivenCompilerStrategy {
         for (Field dstField : dstType.getDeclaredFields()) {
             ReflectMappingInstruction instruction = createInstructionFromAnnotations(srcType, dstType, dstField);
             if (instruction != null) {
-                intermediateLambdas.add(ReflectMapLambdaCompiler.compile(instruction));
+                intermediateLambdas.add(LambdaCompiler.compile(instruction));
             }
         }
 
-        return ReflectMapLambdaCompiler.compile(intermediateLambdas);
+        return LambdaCompiler.compile(intermediateLambdas);
     }
 
     private static ReflectMappingInstruction createInstructionFromAnnotations(Class<?> srcType, Class<?> dstType, Field dstField) {
@@ -78,7 +80,7 @@ public final class AnnotationDrivenCompilerStrategy {
         try {
             for (String fieldName : fieldNames) {
                 Field f = currentClass.getDeclaredField(fieldName);
-                MethodHandle getter = ReflectMapLambdaCompiler.findGetterHandle(currentClass, f);
+                MethodHandle getter = LambdaHandleFactory.getterHandle(currentClass, f);
 
                 if (current != null) {
                     current = MethodHandles.filterReturnValue(current, getter);
@@ -101,7 +103,7 @@ public final class AnnotationDrivenCompilerStrategy {
         try {
             if (fieldNames.length == 1) {
                 Field f = dstRootClass.getDeclaredField(fieldNames[0]);
-                return ReflectMapLambdaCompiler.findSetterHandle(dstRootClass, f);
+                return LambdaHandleFactory.setterHandle(dstRootClass, f);
             } else {
                 String[] nestedFieldNames = Arrays.copyOf(fieldNames, fieldNames.length - 1);
                 MethodHandle getter = createGetterHandle(dstRootClass, nestedFieldNames);
@@ -109,7 +111,7 @@ public final class AnnotationDrivenCompilerStrategy {
 
                 String lastFieldName = fieldNames[fieldNames.length - 1];
                 Field f = getterRetType.getDeclaredField(lastFieldName);
-                MethodHandle setter = ReflectMapLambdaCompiler.findSetterHandle(getterRetType, f);
+                MethodHandle setter = LambdaHandleFactory.setterHandle(getterRetType, f);
 
                 return MethodHandles.foldArguments(setter, getter);
             }

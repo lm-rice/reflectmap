@@ -1,8 +1,12 @@
-package com.reflectmap.core;
+package com.reflectmap.internal.lambda;
 
 import java.lang.invoke.MethodHandles;
 
-final class ReflectMapLookupCache extends ClassValue<MethodHandles.Lookup> {
+final class LambdaPrivateLookupCache extends ClassValue<MethodHandles.Lookup> {
+
+    static final LambdaPrivateLookupCache INSTANCE = new LambdaPrivateLookupCache();
+
+    private LambdaPrivateLookupCache() {}
 
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
 

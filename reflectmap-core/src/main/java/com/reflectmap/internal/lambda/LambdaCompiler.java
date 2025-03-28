@@ -1,35 +1,15 @@
-package com.reflectmap.core;
+package com.reflectmap.internal.lambda;
+
+import com.reflectmap.core.ReflectMappingInstruction;
 
 import java.lang.invoke.*;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public final class ReflectMapLambdaCompiler {
+public final class LambdaCompiler {
 
-    private static final ReflectMapLookupCache LOOKUP_STORE = new ReflectMapLookupCache();
-    private static final ReflectMapHandleCache HANDLE_CACHE = new ReflectMapHandleCache(LOOKUP_STORE);
-
-    // We cache this CallSite to avoid generating a new lambda class for every mapping.
-    private static final CallSite CALL_SITE;
-    static {
-        MethodType consumerType = MethodType.methodType(void.class, Object.class, Object.class);
-        try {
-            CALL_SITE = LambdaMetafactory.metafactory(
-                    LOOKUP_STORE.get(ReflectMapLambdaCompiler.class),
-                    "accept",
-                    MethodType.methodType(BiConsumer.class, MethodHandle.class),
-                    consumerType.erase(),
-                    MethodHandles.exactInvoker(consumerType),
-                    MethodType.methodType(void.class, Object.class, Object.class)
-            );
-        } catch (LambdaConversionException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private ReflectMapLambdaCompiler() {}
+    private LambdaCompiler() {}
 
     /**
      * Compiles a list of resolved mapping instructions into a single BiConsumer.
@@ -43,8 +23,8 @@ public final class ReflectMapLambdaCompiler {
     public static BiConsumer<Object, Object> compile(ReflectMappingInstruction instruction) throws Throwable {
         MethodHandle getter = instruction.getter();
         MethodHandle setter = instruction.setter();
-        MethodHandle handle = MethodHandles.insertArguments(HANDLE_CACHE.PERFORM_COPY, 0, getter, setter);
-        return asLambda(handle);
+        MethodHandle handle = MethodHandles.insertArguments(LambdaHandleLookupTable.PERFORM_COPY.getHandle(), 0, getter, setter);
+        return LambdaConverter.convert(handle);
     }
 
     /**
@@ -57,9 +37,7 @@ public final class ReflectMapLambdaCompiler {
      * a logarithmic call stack depth. With reduced depth and therefore smaller lambdas, we support the ability of JIT
      * to inline and optimize composite lambdas.
      *
-     * @param consumers an array of consumers
-     * @param start     the starting index (inclusive)
-     * @param end       the ending index (exclusive)
+     * @param consumers a list of consumers
      * @return a composite lambda which executes each consumer sequentially.
      * @throws Throwable if a method handle invocation fails.
      */
@@ -67,7 +45,7 @@ public final class ReflectMapLambdaCompiler {
     public static BiConsumer<Object, Object> compile(List<BiConsumer<Object, Object>> consumers) throws Throwable {
         if (consumers.isEmpty()) {
             // TODO: Probably don't need to do this; just cache the consumer globally.
-            return asLambda(HANDLE_CACHE.NO_OP);
+            return LambdaConverter.convert(LambdaHandleLookupTable.NO_OP.getHandle());
         }
 
         while (consumers.size() > 1) {
@@ -102,20 +80,7 @@ public final class ReflectMapLambdaCompiler {
      * @throws Throwable if a method handle invocation fails.
      */
     private static BiConsumer<Object, Object> compile(BiConsumer<Object, Object> a, BiConsumer<Object, Object> b) throws Throwable {
-        return asLambda(MethodHandles.insertArguments(HANDLE_CACHE.COMPOSE, 0, a, b));
-    }
-
-    @SuppressWarnings("unchecked")
-    private static BiConsumer<Object, Object> asLambda(MethodHandle handle) throws Throwable {
-        return (BiConsumer<Object, Object>) CALL_SITE.getTarget().invokeExact(handle);
-    }
-
-    public static MethodHandle findGetterHandle(Class<?> cls, Field f) throws NoSuchFieldException, IllegalAccessException {
-        return LOOKUP_STORE.get(cls).findGetter(cls, f.getName(), f.getType());
-    }
-
-    public static MethodHandle findSetterHandle(Class<?> cls, Field f) throws NoSuchFieldException, IllegalAccessException {
-        return LOOKUP_STORE.get(cls).findSetter(cls, f.getName(), f.getType());
+        return LambdaConverter.convert(MethodHandles.insertArguments(LambdaHandleLookupTable.COMPOSE.getHandle(), 0, a, b));
     }
 
 }
