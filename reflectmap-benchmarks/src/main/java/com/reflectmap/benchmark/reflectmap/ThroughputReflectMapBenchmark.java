@@ -1,4 +1,4 @@
-package com.reflectmap.benchmark;
+package com.reflectmap.benchmark.reflectmap;
 
 import com.reflectmap.ReflectMap;
 import com.reflectmap.mock.Destination25;
@@ -7,15 +7,15 @@ import org.openjdk.jmh.annotations.*;
 
 import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode(Mode.All)
+@BenchmarkMode(Mode.Throughput)
 @Warmup(iterations = 5)
 @Measurement(iterations = 10)
-@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
 @State(Scope.Thread)
-public class ReflectMapBenchmark {
+public class ThroughputReflectMapBenchmark {
 
-    private Source25 src;
-    private Destination25 dst;
+    protected Source25 src;
+    protected Destination25 dst;
 
     @Setup(Level.Trial)
     public void setup() {
@@ -26,12 +26,11 @@ public class ReflectMapBenchmark {
                 "Hello21", "Hello22", "Hello23", "Hello24", "Hello25");
 
         dst = new Destination25();
-
-        ReflectMap.map(src, Source25.class, dst, Destination25.class);
     }
 
     @Benchmark
     public void map() {
         ReflectMap.map(src, Source25.class, dst, Destination25.class);
     }
+
 }

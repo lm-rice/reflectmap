@@ -13,7 +13,6 @@ build:
 
 reflectmap: build
 	java -jar $(BENCH_JAR) \
-		-bm all \
 		-rf json \
 		-rff $(RESULTS_DIR)/reflectmap/all-metrics.json \
 		-f1	\
@@ -24,7 +23,6 @@ reflectmap: build
 
 modelmapper: build
 	java -jar $(BENCH_JAR) \
-		-bm all \
 		-rf json \
 		-rff $(RESULTS_DIR)/modelmapper/all-metrics.json \
 		-f1	\

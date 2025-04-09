@@ -1,21 +1,16 @@
-package com.reflectmap.benchmark;
+package com.reflectmap.benchmark.modelmapper;
 
-import com.reflectmap.mock.Destination25;
 import com.reflectmap.mock.Source25;
 import org.modelmapper.ModelMapper;
 import org.openjdk.jmh.annotations.*;
 
-import java.util.concurrent.TimeUnit;
-
-@BenchmarkMode(Mode.All)
 @Warmup(iterations = 5)
 @Measurement(iterations = 10)
-@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-public class ModelMapperBenchmark {
+public abstract class AbstractModelMapperBenchmark {
 
-    private ModelMapper modelMapper;
-    private Source25 src;
+    protected ModelMapper modelMapper;
+    protected Source25 src;
 
     @Setup(Level.Trial)
     public void setup() {
@@ -28,8 +23,4 @@ public class ModelMapperBenchmark {
         modelMapper = new ModelMapper();
     }
 
-    @Benchmark
-    public Destination25 map() {
-        return modelMapper.map(src, Destination25.class);
-    }
 }
