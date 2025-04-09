@@ -1,50 +1,41 @@
-package com.reflectmap.internal.lambda;
+package com.reflectmap.internal.lambda.compiler;
 
-import com.reflectmap.core.ReflectMappingInstruction;
-import com.reflectmap.core.utils.ReflectMapTypeUtils;
 import com.reflectmap.exception.FieldNotFoundException;
-import com.reflectmap.exception.IncompatibleFieldTypesException;
+import com.reflectmap.exception.FieldsNotFoundException;
+import com.reflectmap.internal.lambda.factory.*;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Queue;
 import java.util.function.BiConsumer;
 
 public abstract class AbstractLambdaCompiler implements Compiler {
 
     @Override
     public BiConsumer<Object, Object> compile(Class<?> srcType, Class<?> dstType) throws Throwable {
-        List<BiConsumer<Object, Object>> intermediateLambdas = new ArrayList<>();
+        Queue<BiConsumer<Object, Object>> consumers = new ArrayDeque<>();
         for (Field dstField : dstType.getDeclaredFields()) {
-            ReflectMappingInstruction instruction = createInstruction(srcType, dstType, dstField);
+            LambdaCompilerInstruction instruction = createInstruction(srcType, dstType, dstField);
             if (instruction != null) {
-                intermediateLambdas.add(LambdaCompiler.compile(instruction));
+                consumers.offer(CopyBiConsumerFactory.of(instruction));
             }
         }
 
-        return LambdaCompiler.compile(intermediateLambdas);
-
-    }
-
-    protected abstract ReflectMappingInstruction createInstruction(Class<?> srcType, Class<?> dstType, Field dstField) throws IllegalAccessException;
-
-    protected ReflectMappingInstruction createInstruction(MethodHandle getter, MethodHandle setter, Class<?> srcType, Class<?> dstType) {
-        Class<?> getterFieldType = getter.type().returnType();
-        Class<?> setterFieldType = setter.type().lastParameterType();
-
-        if (!ReflectMapTypeUtils.isTypeCompatible(getterFieldType, setterFieldType)) {
-            throw new IncompatibleFieldTypesException(srcType, srcType.getName(), dstType, dstType.getName());
+        if (consumers.isEmpty()) {
+            throw new FieldsNotFoundException(srcType, dstType);
         }
 
-        return new ReflectMappingInstruction(getter, setter, srcType);
+        return CompositeBiConsumerFactory.of(consumers);
     }
+
+    protected abstract LambdaCompilerInstruction createInstruction(Class<?> srcType, Class<?> dstType, Field dstField) throws IllegalAccessException;
 
     protected MethodHandle createGetterHandle(Class<?> srcType, String srcFieldName) throws NoSuchFieldException, IllegalAccessException {
         Field srcField = srcType.getDeclaredField(srcFieldName);
-        return LambdaHandleFactory.getterHandle(srcType, srcField);
+        return MethodHandleFactory.getter(srcType, srcField);
     }
 
     protected MethodHandle createGetterHandle(Class<?> srcType, String... srcFieldNames) throws IllegalAccessException {
@@ -77,7 +68,7 @@ public abstract class AbstractLambdaCompiler implements Compiler {
     }
 
     protected MethodHandle createSetterHandle(Class<?> dstType, Field dstField) throws NoSuchFieldException, IllegalAccessException {
-        return LambdaHandleFactory.setterHandle(dstType, dstField);
+        return MethodHandleFactory.setter(dstType, dstField);
     }
 
     protected MethodHandle createSetterHandle(Class<?> dstType, String dstFieldName) throws NoSuchFieldException, IllegalAccessException {

@@ -1,7 +1,7 @@
 package com.reflectmap;
 
-import com.reflectmap.internal.lambda.Compilers;
-import com.reflectmap.internal.lambda.LambdaFactory;
+import com.reflectmap.internal.lambda.compiler.Compilers;
+import com.reflectmap.internal.lambda.CompiledLambdaStore;
 
 import java.util.function.BiConsumer;
 
@@ -13,19 +13,19 @@ public enum CopyMode {
     /**
      * Attempt to copy only to fields annotated by {@code FieldMapping}.
      */
-    ANNOTATION_DRIVEN(new LambdaFactory(Compilers.ANNOTATION_DRIVEN)),
+    ANNOTATION_DRIVEN(new CompiledLambdaStore(Compilers.ANNOTATION_DRIVEN)),
     /**
      * Attempt to copy only to fields with the same name in the source and destination class.
      */
-    DIRECT_COPY(new LambdaFactory(Compilers.DIRECT_COPY));
+    DIRECT_COPY(new CompiledLambdaStore(Compilers.DIRECT_COPY));
 
-    final LambdaFactory factory;
+    final CompiledLambdaStore store;
 
-    CopyMode(LambdaFactory factory) {
-        this.factory = factory;
+    CopyMode(CompiledLambdaStore store) {
+        this.store = store;
     }
 
     BiConsumer<Object, Object> get(Class<?> src, Class<?> dst) {
-        return factory.get(src).get(dst);
+        return store.get(src).get(dst);
     }
 }

@@ -5,10 +5,9 @@ import static com.reflectmap.mock.Sources.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.reflectmap.ReflectMap;
+import com.reflectmap.exception.FieldsNotFoundException;
 import com.reflectmap.exception.IncompatibleFieldTypesException;
 import org.junit.jupiter.api.Test;
-
-// ----- Test Suite -----
 
 public class ReflectMapTest {
 
@@ -42,9 +41,7 @@ public class ReflectMapTest {
     void testNoMatchingCandidate() {
         SourceB src = new SourceB(123);
         Destination4 dst = new Destination4();
-
-        ReflectMap.map(src, SourceB.class, dst, Destination4.class);
-        assertNull(dst.getDestValue(), "Destination4 should remain null if no candidate matches");
+        assertThrows(FieldsNotFoundException.class, () -> ReflectMap.map(src, SourceB.class, dst, Destination4.class));
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.reflectmap.core.utils;
+package com.reflectmap.internal.util;
 
 public final class PrimitiveTypeConverter {
 

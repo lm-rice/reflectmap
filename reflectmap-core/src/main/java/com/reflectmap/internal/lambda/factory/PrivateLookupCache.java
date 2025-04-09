@@ -1,12 +1,10 @@
-package com.reflectmap.internal.lambda;
+package com.reflectmap.internal.lambda.factory;
 
 import java.lang.invoke.MethodHandles;
 
-final class LambdaPrivateLookupCache extends ClassValue<MethodHandles.Lookup> {
+final class PrivateLookupCache extends ClassValue<MethodHandles.Lookup> {
 
-    static final LambdaPrivateLookupCache INSTANCE = new LambdaPrivateLookupCache();
-
-    private LambdaPrivateLookupCache() {}
+    static final PrivateLookupCache INSTANCE = new PrivateLookupCache();
 
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
 
@@ -18,5 +16,7 @@ final class LambdaPrivateLookupCache extends ClassValue<MethodHandles.Lookup> {
             throw new RuntimeException(e);
         }
     }
+
+    private PrivateLookupCache() {}
 
 }

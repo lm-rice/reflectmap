@@ -1,4 +1,4 @@
-package com.reflectmap.internal.lambda;
+package com.reflectmap.internal.lambda.compiler;
 
 import java.util.function.BiConsumer;
 

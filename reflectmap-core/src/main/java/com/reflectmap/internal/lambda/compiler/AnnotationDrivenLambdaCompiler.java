@@ -1,8 +1,7 @@
-package com.reflectmap.internal.lambda;
+package com.reflectmap.internal.lambda.compiler;
 
 import com.reflectmap.annotation.FieldMapping;
-import com.reflectmap.core.ReflectMappingInstruction;
-import com.reflectmap.core.utils.ReflectMapTypeUtils;
+import com.reflectmap.internal.util.TypeUtils;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
@@ -12,7 +11,7 @@ final class AnnotationDrivenLambdaCompiler extends AbstractLambdaCompiler {
     AnnotationDrivenLambdaCompiler() {}
 
     @Override
-    protected ReflectMappingInstruction createInstruction(Class<?> srcType, Class<?> dstType, Field dstField) throws IllegalAccessException {
+    protected LambdaCompilerInstruction createInstruction(Class<?> srcType, Class<?> dstType, Field dstField) throws IllegalAccessException {
         FieldMapping[] annotations = dstField.getDeclaredAnnotationsByType(FieldMapping.class);
 
         if (annotations.length == 0) {
@@ -21,7 +20,7 @@ final class AnnotationDrivenLambdaCompiler extends AbstractLambdaCompiler {
 
         FieldMapping annotation = null;
         for (FieldMapping candidate : annotations) {
-            if (ReflectMapTypeUtils.isTypeCompatible(srcType, candidate.srcType())) {
+            if (TypeUtils.isTypeCompatible(srcType, candidate.srcType())) {
                 annotation = candidate;
                 break;
             }
@@ -37,6 +36,6 @@ final class AnnotationDrivenLambdaCompiler extends AbstractLambdaCompiler {
         MethodHandle getter = createGetterHandle(srcType, srcFieldNames);
         MethodHandle setter = createSetterHandle(dstType, dstFieldNames);
 
-        return super.createInstruction(getter, setter, srcType, dstType);
+        return new LambdaCompilerInstruction(getter, setter, srcType, dstType);
     }
 }

@@ -1,6 +1,4 @@
-package com.reflectmap.internal.lambda;
-
-import com.reflectmap.core.ReflectMappingInstruction;
+package com.reflectmap.internal.lambda.compiler;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
@@ -8,7 +6,7 @@ import java.lang.reflect.Field;
 final class DirectCopyLambdaCompiler extends AbstractLambdaCompiler {
 
     @Override
-    protected ReflectMappingInstruction createInstruction(Class<?> srcType, Class<?> dstType, Field dstField) throws IllegalAccessException {
+    protected LambdaCompilerInstruction createInstruction(Class<?> srcType, Class<?> dstType, Field dstField) throws IllegalAccessException {
         MethodHandle getter = createGetterHandle(srcType, dstField.getName());
         MethodHandle setter = createSetterHandle(dstType, dstField);
 
@@ -16,7 +14,7 @@ final class DirectCopyLambdaCompiler extends AbstractLambdaCompiler {
             return null;
         }
 
-        return super.createInstruction(getter, setter, srcType, dstType);
+        return new LambdaCompilerInstruction(getter, setter, srcType, dstType);
     }
 
 

@@ -1,27 +1,28 @@
 package com.reflectmap.internal.lambda;
 
 import com.reflectmap.exception.ReflectMapException;
+import com.reflectmap.internal.lambda.compiler.Compiler;
 
 import java.util.function.BiConsumer;
 
-public final class LambdaFactory extends ClassValue<ClassValue<BiConsumer<Object, Object>>> {
+public final class CompiledLambdaStore extends ClassValue<ClassValue<BiConsumer<Object, Object>>> {
 
     private final Compiler compiler;
 
-    public LambdaFactory(Compiler compiler) {
+    public CompiledLambdaStore(Compiler compiler) {
         this.compiler = compiler;
     }
 
     @Override
     protected ClassValue<BiConsumer<Object, Object>> computeValue(Class<?> srcType) {
-        return new LambdaValueFactory(srcType);
+        return new CompiledLambdaFactory(srcType);
     }
 
-    private final class LambdaValueFactory extends ClassValue<BiConsumer<Object, Object>> {
+    private final class CompiledLambdaFactory extends ClassValue<BiConsumer<Object, Object>> {
 
         private final Class<?> srcType;
 
-        LambdaValueFactory(Class<?> srcType) {
+        CompiledLambdaFactory(Class<?> srcType) {
             this.srcType = srcType;
         }
 

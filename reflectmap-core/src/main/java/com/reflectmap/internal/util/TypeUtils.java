@@ -1,8 +1,8 @@
-package com.reflectmap.core.utils;
+package com.reflectmap.internal.util;
 
-public final class ReflectMapTypeUtils {
+public final class TypeUtils {
 
-    private ReflectMapTypeUtils() {}
+    private TypeUtils() {}
 
     public static boolean isTypeCompatible(Class<?> a, Class<?> b) {
         if (a == null || b == null) return false;
