@@ -16,14 +16,14 @@ public class InvokedBiConsumerFactory {
         try {
             CALL_SITE = LambdaMetafactory.metafactory(
                     PrivateLookupCache.INSTANCE.get(InvokedBiConsumer.class),
-                    "accept",
+                    InvokedBiConsumer.METHOD_NAME,
                     FACTORY_TYPE,
                     InvokedBiConsumer.METHOD_TYPE.erase(),
                     MethodHandles.exactInvoker(InvokedBiConsumer.METHOD_TYPE),
                     InvokedBiConsumer.METHOD_TYPE
             );
         } catch (Throwable e) {
-            throw new ExceptionInInitializerError("Failed to initialize InvokedBiConsumerFactory: " + e);
+            throw new ExceptionInInitializerError(e);
         }
     }
 
@@ -55,6 +55,11 @@ public class InvokedBiConsumerFactory {
     private static final class InvokedBiConsumer {
 
         private InvokedBiConsumer() {}
+
+        /**
+         * The name of {@link #accept(Object, Object)}.
+         */
+        static final String METHOD_NAME = "accept";
 
         /**
          * Corresponds to {@link #accept(Object, Object)}.
