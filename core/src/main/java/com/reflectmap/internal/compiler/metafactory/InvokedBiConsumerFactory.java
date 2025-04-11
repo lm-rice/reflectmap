@@ -15,7 +15,7 @@ public class InvokedBiConsumerFactory {
     static {
         try {
             CALL_SITE = LambdaMetafactory.metafactory(
-                    PrivateLookupCache.INSTANCE.get(InvokedBiConsumer.class),
+                    PrivateLookupUtils.privateLookupIn(InvokedBiConsumer.class),
                     InvokedBiConsumer.METHOD_NAME,
                     FACTORY_TYPE,
                     InvokedBiConsumer.METHOD_TYPE.erase(),

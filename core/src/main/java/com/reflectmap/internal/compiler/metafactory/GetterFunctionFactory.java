@@ -16,7 +16,7 @@ public final class GetterFunctionFactory {
     static {
         try {
             CALL_SITE = LambdaMetafactory.metafactory(
-                    PrivateLookupCache.INSTANCE.get(GetterFunction.class),
+                    PrivateLookupUtils.privateLookupIn(GetterFunction.class),
                     GetterFunction.METHOD_NAME,
                     FACTORY_TYPE,
                     GetterFunction.METHOD_TYPE.erase(),

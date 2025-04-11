@@ -20,7 +20,7 @@ public final class SetterBiConsumerFactory {
     static {
         try {
             CALL_SITE = LambdaMetafactory.metafactory(
-                    PrivateLookupCache.INSTANCE.get(SetterBiConsumerFactory.class),
+                    PrivateLookupUtils.privateLookupIn(SetterBiConsumerFactory.class),
                     SetterConsumer.METHOD_NAME,
                     FACTORY_TYPE,
                     SetterConsumer.METHOD_TYPE.erase(),
